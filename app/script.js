@@ -1,7 +1,7 @@
-// Pie Dodgeball
+// Pie-Ball
 /*^*^*^*^*^*^*^*
 script.js
-The main script for Pie Dodgeball.
+The main script for Pie-Ball.
 *^*^*^*^*^*^*^*/
 
 let game = {
@@ -57,6 +57,9 @@ class Game extends Phaser.Scene {
       game.meterIndicator.y = game.engine.gameHeightCenter + 256;
       game.holdDur = 0;
     });
+
+    // ********** Colliders **********
+    this.physics.add.collider(game.pies, game.pies);
   }
   update() {
     // Player movement

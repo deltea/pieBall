@@ -1,4 +1,4 @@
-// Pie Dodgeball
+// Pie-Ball
 /*^*^*^*^*^*^*^*
 config.js
 The configuration for the Phaser 3 framework.
