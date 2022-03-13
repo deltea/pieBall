@@ -49,6 +49,7 @@ class Game extends Phaser.Scene {
     // Create groups
     game.boundaries = this.physics.add.group();
     game.pies = this.physics.add.group();
+    game.enemyPies = this.physics.add.group();
     game.enemies = this.physics.add.group();
 
     // Create player
@@ -72,11 +73,14 @@ class Game extends Phaser.Scene {
 
     // Create enemies
     for (var i = 0; i < this.enemyCount["normal"]; i++) {
-      game.enemies.create((game.engine.gameWidth / this.enemyCount["normal"]) * i, game.engine.gameHeight / 4, "enemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["normal"]) * i, game.engine.gameHeight / 4, "enemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+      enemy.pieTimerMax = game.engine.randomBetween(100, 500);
+      enemy.pieTimer = 0;
     }
 
     // ********** Colliders **********
     this.physics.add.collider(game.player, game.boundaries);
+    this.physics.add.collider(game.player, game.enemyPies);
     this.physics.add.collider(game.enemies, game.boundaries);
     this.physics.add.collider(game.enemies, game.pies);
     this.physics.add.collider(game.pies, game.pies);
@@ -110,11 +114,11 @@ class Game extends Phaser.Scene {
     // Player movement
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A).isDown) {
       game.player.setVelocityX(-300);
-      game.pieDir = 2;
+      game.pieDir = -2;
     }
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D).isDown) {
       game.player.setVelocityX(300);
-      game.pieDir = -2;
+      game.pieDir = 2;
     }
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S).isDown) {
       game.player.setVelocityY(300);
@@ -136,6 +140,15 @@ class Game extends Phaser.Scene {
     game.arrow.x = game.player.x - 10;
     game.arrow.y = game.player.y - 20;
     game.arrow.angle = game.pieAngle + 160;
+    game.enemies.getChildren().forEach(enemy => {
+      enemy.pieTimer++;
+      console.log(enemy.pieTimer);
+      if (enemy.pieTimer >= enemy.pieTimerMax) {
+        game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500));
+        enemy.pieTimerMax = game.engine.randomBetween(100, 500);
+        enemy.pieTimer = 0;
+      }
+    });
   }
 }
 
