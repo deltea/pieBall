@@ -8,7 +8,8 @@ The main script for Pie-Ball.
 let game = {
   pieAngle: 0,
   pieDir: -2,
-  holdDur: 0
+  holdDur: 0,
+  sfx: {}
 };
 class Game extends Phaser.Scene {
   constructor(key, normalCount, fastCount, cheaterCount, multiCount) {
@@ -30,10 +31,20 @@ class Game extends Phaser.Scene {
     this.load.image("meterIndicator", "assets/meterIndicator.png");
     this.load.image("reloadBar", "assets/reloadBar.png");
     this.load.image("enemy", "assets/enemy.png");
+    this.load.audio("music", "assets/music.mp3");
+    this.load.audio("hit", "assets/hit.wav");
+    this.load.audio("ready", "assets/ready.wav");
+    this.load.audio("throw", "assets/throw.wav");
   }
   create() {
     game.engine = new Engine(this);
     game.engine.mouseInput();
+
+    // Sounds
+    game.sfx.music = this.sound.add("music").setLoop(true).play({volume: 0.5});
+    game.sfx.hit = this.sound.add("hit");
+    game.sfx.ready = this.sound.add("ready");
+    game.sfx.throw = this.sound.add("throw");
 
     // Create groups
     game.boundaries = this.physics.add.staticGroup();
@@ -65,6 +76,7 @@ class Game extends Phaser.Scene {
     // ********** Interaction **********
     this.input.on("pointerup", () => {
       if (game.reloadBarStuff.height >= 544) {
+        game.sfx.throw.play();
         let pie = game.pies.create(game.player.x, game.player.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0);
         this.physics.velocityFromAngle(game.pieAngle, game.holdDur * 1.5, pie.body.velocity);
         game.meterIndicator.y = game.engine.gameHeightCenter + 256;
@@ -96,6 +108,9 @@ class Game extends Phaser.Scene {
     }
     if (game.reloadBarStuff.height < 544) {
       game.reloadBarStuff.height += 5;
+    }
+    if (game.reloadBarStuff.height === 540) {
+      game.sfx.ready.play();
     }
     game.pieAngle += game.pieDir;
     game.arrow.x = game.player.x - 10;
