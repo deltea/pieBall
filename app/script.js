@@ -5,7 +5,8 @@ The main script for Pie Dodgeball.
 *^*^*^*^*^*^*^*/
 
 let game = {
-  pieAngle: 0
+  pieAngle: 0,
+  pieDir: -3
 };
 class Game extends Phaser.Scene {
   constructor() {
@@ -34,7 +35,7 @@ class Game extends Phaser.Scene {
     }
 
     // Create arrow
-    game.arrow = this.physics.add.sprite(game.player.x - 10, game.player.y - 20, "arrow").setScale(8).setGravityY(-1500).setOrigin(1, 1);
+    game.arrow = this.physics.add.sprite(game.player.x - 10, game.player.y - 20, "arrow").setScale(8).setGravityY(-1500);
 
     // ********** Colliders **********
     this.physics.add.collider(game.player, game.boundaries);
@@ -59,9 +60,9 @@ class Game extends Phaser.Scene {
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).isDown) {
       game.player.setVelocityY(-300);
     }
-    game.pieAngle += 3;
+    game.pieAngle += game.pieDir;
     game.arrow.x = game.player.x - 10;
     game.arrow.y = game.player.y - 20;
-    game.arrow.angle = game.pieAngle + 90;
+    game.arrow.angle = game.pieAngle + 160;
   }
 }
