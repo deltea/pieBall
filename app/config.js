@@ -21,7 +21,7 @@ const config = {
         y: 1500
       },
       enableBody: true,
-      // debug: true
+      debug: true
     }
   },
   scene: [Level1, Level2, Level3, PreBoss, Boss]

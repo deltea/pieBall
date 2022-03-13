@@ -47,7 +47,7 @@ class Game extends Phaser.Scene {
     game.sfx.throw = this.sound.add("throw");
 
     // Create groups
-    game.boundaries = this.physics.add.staticGroup();
+    game.boundaries = this.physics.add.group();
     game.pies = this.physics.add.group();
     game.enemies = this.physics.add.group();
 
@@ -56,7 +56,7 @@ class Game extends Phaser.Scene {
 
     // Create boundary
     for (var i = 0; i < 400 * Math.round(game.engine.gameWidth / 400) + 1; i += 400) {
-      game.boundaries.create(i, game.engine.gameHeightCenter, "boundaries").setScale(8).setSize(400, 8).setOffset(0, -8);
+      game.boundaries.create(i, game.engine.gameHeightCenter, "boundaries").setScale(8).setSize(400, 1).setOffset(0, 0).setImmovable(true).setGravityY(-1500);
     }
 
     // Create arrow
@@ -70,8 +70,16 @@ class Game extends Phaser.Scene {
     game.reloadBar = this.add.image(game.engine.gameWidth - 80, game.engine.gameHeightCenter, "reloadBar").setScale(8).setDepth(1);
     game.reloadBarStuff = this.add.rectangle(game.engine.gameWidth - 84, game.reloadBar.y - 272, 56, 0, 0x000000).setDepth(1);
 
+    // Create enemies
+    for (var i = 0; i < this.enemyCount["normal"]; i++) {
+      game.enemies.create((game.engine.gameWidth / this.enemyCount["normal"]) * i, game.engine.gameHeight / 4, "enemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+    }
+
     // ********** Colliders **********
     this.physics.add.collider(game.player, game.boundaries);
+    this.physics.add.collider(game.enemies, game.boundaries);
+    this.physics.add.collider(game.enemies, game.pies);
+    this.physics.add.collider(game.pies, game.pies);
 
     // ********** Interaction **********
     this.input.on("pointerup", () => {
@@ -85,16 +93,28 @@ class Game extends Phaser.Scene {
       }
     });
 
-    // ********** Colliders **********
-    this.physics.add.collider(game.pies, game.pies);
+    // ********** Timers **********
+    this.time.addEvent({
+      delay: 2000,
+      callback: () => {
+        game.enemies.getChildren().forEach(enemy => {
+          enemy.setVelocityY(game.engine.randomBetween(-300, 300));
+          enemy.setVelocityX(game.engine.randomBetween(-300, 300));
+        });
+      },
+      callbackScope: this,
+      repeat: -1
+    });
   }
   update() {
     // Player movement
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A).isDown) {
       game.player.setVelocityX(-300);
+      game.pieDir = 2;
     }
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D).isDown) {
       game.player.setVelocityX(300);
+      game.pieDir = -2;
     }
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S).isDown) {
       game.player.setVelocityY(300);
