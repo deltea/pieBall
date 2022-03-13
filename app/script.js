@@ -4,14 +4,21 @@ script.js
 The main script for Pie-Ball.
 *^*^*^*^*^*^*^*/
 
+// ********** Main Game Scene **********
 let game = {
   pieAngle: 0,
   pieDir: -2,
   holdDur: 0
 };
 class Game extends Phaser.Scene {
-  constructor() {
-    super();
+  constructor(key, normalCount, fastCount, cheaterCount, multiCount) {
+    super(key);
+    this.enemyCount = {
+      "normal": normalCount,
+      "fast": fastCount,
+      "cheater": cheaterCount,
+      "multi": multiCount
+    };
   }
   preload() {
     // Load assets
@@ -22,16 +29,16 @@ class Game extends Phaser.Scene {
     this.load.image("meter", "assets/meter.png");
     this.load.image("meterIndicator", "assets/meterIndicator.png");
     this.load.image("reloadBar", "assets/reloadBar.png");
+    this.load.image("enemy", "assets/enemy.png");
   }
   create() {
     game.engine = new Engine(this);
-
-    // Mouse input
     game.engine.mouseInput();
 
     // Create groups
     game.boundaries = this.physics.add.staticGroup();
     game.pies = this.physics.add.group();
+    game.enemies = this.physics.add.group();
 
     // Create player
     game.player = this.physics.add.sprite(game.engine.gameWidthCenter, 3 * (game.engine.gameHeight / 4), "player").setScale(8).setGravityY(-1500).setDrag(500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
@@ -94,5 +101,32 @@ class Game extends Phaser.Scene {
     game.arrow.x = game.player.x - 10;
     game.arrow.y = game.player.y - 20;
     game.arrow.angle = game.pieAngle + 160;
+  }
+}
+
+// ********** Levels **********
+class Level1 extends Game {
+  constructor() {
+    super("Level1", 4, 1, 0, 0);
+  }
+}
+class Level2 extends Game {
+  constructor() {
+    super("Level2", 3, 1, 1, 0);
+  }
+}
+class Level3 extends Game {
+  constructor() {
+    super("Level3", 1, 2, 1, 1);
+  }
+}
+class PreBoss extends Game {
+  constructor() {
+    super("PreBoss", 0, 2, 2, 2);
+  }
+}
+class Boss extends Game {
+  constructor() {
+    super("Boss", 0, 0, 0, 0);
   }
 }
