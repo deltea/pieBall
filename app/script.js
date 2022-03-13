@@ -21,6 +21,7 @@ class Game extends Phaser.Scene {
     this.load.image("arrow", "assets/arrow.png");
     this.load.image("meter", "assets/meter.png");
     this.load.image("meterIndicator", "assets/meterIndicator.png");
+    this.load.image("reloadBar", "assets/reloadBar.png");
   }
   create() {
     game.engine = new Engine(this);
@@ -47,15 +48,22 @@ class Game extends Phaser.Scene {
     game.meter = this.add.image(120, game.engine.gameHeightCenter, "meter").setScale(8).setDepth(1);
     game.meterIndicator = this.add.image(120, game.engine.gameHeightCenter + 256, "meterIndicator").setScale(8).setDepth(1);
 
+    // Create reload bar
+    game.reloadBar = this.add.image(game.engine.gameWidth - 80, game.engine.gameHeightCenter, "reloadBar").setScale(8).setDepth(1);
+    game.reloadBarStuff = this.add.rectangle(game.engine.gameWidth - 84, game.reloadBar.y - 272, 56, 0, 0x000000).setDepth(1);
+
     // ********** Colliders **********
     this.physics.add.collider(game.player, game.boundaries);
 
     // ********** Interaction **********
     this.input.on("pointerup", () => {
-      let pie = game.pies.create(game.player.x, game.player.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0);
-      this.physics.velocityFromAngle(game.pieAngle, game.holdDur * 1.5, pie.body.velocity);
-      game.meterIndicator.y = game.engine.gameHeightCenter + 256;
-      game.holdDur = 0;
+      if (game.reloadBarStuff.height >= 544) {
+        let pie = game.pies.create(game.player.x, game.player.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0);
+        this.physics.velocityFromAngle(game.pieAngle, game.holdDur * 1.5, pie.body.velocity);
+        game.meterIndicator.y = game.engine.gameHeightCenter + 256;
+        game.holdDur = 0;
+        game.reloadBarStuff.height = 0;
+      }
     });
 
     // ********** Colliders **********
@@ -75,9 +83,12 @@ class Game extends Phaser.Scene {
     if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).isDown) {
       game.player.setVelocityY(-300);
     }
-    if (game.engine.mouseDown && game.holdDur < 500) {
+    if (game.engine.mouseDown && game.holdDur < 500 && game.reloadBarStuff.height >= 544) {
       game.holdDur += 5;
       game.meterIndicator.y = (game.engine.gameHeightCenter + 256) - game.holdDur;
+    }
+    if (game.reloadBarStuff.height < 544) {
+      game.reloadBarStuff.height += 5;
     }
     game.pieAngle += game.pieDir;
     game.arrow.x = game.player.x - 10;
