@@ -79,7 +79,7 @@ class Game extends Phaser.Scene {
       enemy.pieTimer = 0;
     }
     for (var i = 0; i < this.enemyCount["fast"]; i++) {
-      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["fast"]) * i, game.engine.gameHeight / 4, "fastEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldByY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorlounds(true);
+      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["fast"]) * i, game.engine.gameHeight / 4, "fastEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorlounds(true);
       enemy.pieTimerMax = game.engine.randomBetween(100, 250);
       enemy.pieTimer = 0;
     }
