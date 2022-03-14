@@ -31,6 +31,7 @@ class Game extends Phaser.Scene {
     this.load.image("meterIndicator", "assets/meterIndicator.png");
     this.load.image("reloadBar", "assets/reloadBar.png");
     this.load.image("enemy", "assets/enemy.png");
+    this.load.image("fastEnemy", "assets/fastEnemy.png");
     this.load.audio("music", "assets/music.mp3");
     this.load.audio("hit", "assets/hit.wav");
     this.load.audio("ready", "assets/ready.wav");
@@ -77,6 +78,11 @@ class Game extends Phaser.Scene {
       enemy.pieTimerMax = game.engine.randomBetween(100, 500);
       enemy.pieTimer = 0;
     }
+    for (var i = 0; i < this.enemyCount["fast"]; i++) {
+      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["fast"]) * i, game.engine.gameHeight / 4, "fastEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldByY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorlounds(true);
+      enemy.pieTimerMax = game.engine.randomBetween(100, 250);
+      enemy.pieTimer = 0;
+    }
 
     // ********** Colliders **********
     this.physics.add.collider(game.player, game.boundaries);
@@ -105,8 +111,13 @@ class Game extends Phaser.Scene {
       delay: 2000,
       callback: () => {
         game.enemies.getChildren().forEach(enemy => {
-          enemy.setVelocityY(game.engine.randomBetween(-300, 300));
-          enemy.setVelocityX(game.engine.randomBetween(-300, 300));
+          if (enemy.texture.key === "fastEnemy") {
+            enemy.setVelocityY(game.engine.randomBetween(-600, 600));
+            enemy.setVelocityX(game.engine.randomBetween(-600, 600));
+          } else {
+            enemy.setVelocityY(game.engine.randomBetween(-300, 300));
+            enemy.setVelocityX(game.engine.randomBetween(-300, 300));
+          }
         });
       },
       callbackScope: this,
@@ -145,10 +156,12 @@ class Game extends Phaser.Scene {
     game.arrow.angle = game.pieAngle + 160;
     game.enemies.getChildren().forEach(enemy => {
       enemy.pieTimer++;
-      console.log(enemy.pieTimer);
       if (enemy.pieTimer >= enemy.pieTimerMax) {
         game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500));
         enemy.pieTimerMax = game.engine.randomBetween(100, 500);
+        if (enemy.texture.key === "fastEnemy") {
+          enemy.pieTimerMax = game.engine.randomBetween(100, 250);
+        }
         enemy.pieTimer = 0;
       }
     });
