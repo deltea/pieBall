@@ -24,6 +24,6 @@ const config = {
       // debug: true
     }
   },
-  scene: [Level1, Level2, Level3, PreBoss, Boss]
+  scene: [Start, Level1, Level2, Level3, PreBoss, Boss]
 };
 const phaserGame = new Phaser.Game(config);
