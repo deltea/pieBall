@@ -168,6 +168,23 @@ class Game extends Phaser.Scene {
   }
 }
 
+// ********** Start Scene **********
+class Start extends Phaser.Scene {
+  constructor() {
+    super("Start");
+  }
+  preload() {
+    this.load.image("title", "assets/title.png");
+    this.load.image("start", "assets/start.png");
+  }
+  create() {
+    this.engine = new Engine(this);
+    
+    // Create title
+    this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "title");
+  }
+}
+
 // ********** Levels **********
 class Level1 extends Game {
   constructor() {
