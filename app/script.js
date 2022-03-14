@@ -181,7 +181,14 @@ class Start extends Phaser.Scene {
     this.engine = new Engine(this);
     
     // Create title
-    this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "title");
+    this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "title").setScale(8);
+    
+    // Create start button
+    this.startButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "start").setScale(8).setInteractive();
+    this.startButton.on("pointerup", () => {
+      this.scene.stop();
+      this.scene.start("Level1");
+    });
   }
 }
 
