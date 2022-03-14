@@ -158,7 +158,7 @@ class Game extends Phaser.Scene {
 // ********** Levels **********
 class Level1 extends Game {
   constructor() {
-    super("Level1", 4, 1, 0, 0);
+    super("Level1", 400, 1, 0, 0);
   }
 }
 class Level2 extends Game {
