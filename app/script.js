@@ -32,6 +32,8 @@ class Game extends Phaser.Scene {
     this.load.image("reloadBar", "assets/reloadBar.png");
     this.load.image("enemy", "assets/enemy.png");
     this.load.image("fastEnemy", "assets/fastEnemy.png");
+    this.load.image("floor0", "assets/floor0.png");
+    this.load.image("floor1", "assets/floor1.png");
     this.load.audio("music", "assets/music.mp3");
     this.load.audio("hit", "assets/hit.wav");
     this.load.audio("ready", "assets/ready.wav");
@@ -52,6 +54,13 @@ class Game extends Phaser.Scene {
     game.pies = this.physics.add.group();
     game.enemyPies = this.physics.add.group();
     game.enemies = this.physics.add.group();
+    
+    // Create the floor
+    for (var x = 0; x < Math.round(game.engine.gameWidth * 8); x += 8) {
+      for (var y = 0; y < Math.round(game.engine.gameHeight * 8); y += 8) {
+        this.add.image(x, y, `floor${Math.floor(Math.random() * 1)}`).setScale(8);
+      }
+    }
 
     // Create player
     game.player = this.physics.add.sprite(game.engine.gameWidthCenter, 3 * (game.engine.gameHeight / 4), "player").setScale(8).setGravityY(-1500).setDrag(500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
