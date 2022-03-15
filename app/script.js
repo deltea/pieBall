@@ -176,6 +176,7 @@ class Start extends Phaser.Scene {
   preload() {
     this.load.image("title", "assets/title.png");
     this.load.image("start", "assets/start.png");
+    this.load.image("picker", "assets/picker.png");
   }
   create() {
     this.engine = new Engine(this);
