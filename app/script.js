@@ -32,6 +32,9 @@ class Game extends Phaser.Scene {
     this.load.image("reloadBar", "assets/reloadBar.png");
     this.load.image("enemy", "assets/enemy.png");
     this.load.image("fastEnemy", "assets/fastEnemy.png");
+    this.load.image("floor0", "assets/floor0.png");
+    this.load.image("floor1", "assets/floor1.png");
+    this.load.image("floor2", "assets/floor2.png");
     this.load.audio("music", "assets/music.mp3");
     this.load.audio("hit", "assets/hit.wav");
     this.load.audio("ready", "assets/ready.wav");
@@ -52,6 +55,13 @@ class Game extends Phaser.Scene {
     game.pies = this.physics.add.group();
     game.enemyPies = this.physics.add.group();
     game.enemies = this.physics.add.group();
+
+    // Create the floor
+    for (var x = 0; x < Math.round(game.engine.gameWidth * 8); x += 64) {
+      for (var y = 0; y < Math.round(game.engine.gameHeight * 8); y += 64) {
+        this.add.image(x, y, `floor${Math.floor(Math.random() * 3)}`).setScale(8);
+      }
+    }
 
     // Create player
     game.player = this.physics.add.sprite(game.engine.gameWidthCenter, 3 * (game.engine.gameHeight / 4), "player").setScale(8).setGravityY(-1500).setDrag(500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
@@ -184,7 +194,7 @@ class Start extends Phaser.Scene {
 
     // Create title
     this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "title").setScale(8);
-    
+
     // Picker group
     this.pickerGroup = this.physics.add.staticGroup();
 
