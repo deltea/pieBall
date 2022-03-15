@@ -89,6 +89,7 @@ class Game extends Phaser.Scene {
     this.physics.add.collider(game.player, game.enemyPies);
     this.physics.add.collider(game.enemies, game.boundaries);
     this.physics.add.collider(game.enemies, game.pies, (enemy, pie) => {
+      game.sfx.hit.play();
       enemy.destroy();
       pie.destroy();
     });
