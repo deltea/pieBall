@@ -179,10 +179,10 @@ class Start extends Phaser.Scene {
   }
   create() {
     this.engine = new Engine(this);
-    
+
     // Create title
     this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "title").setScale(8);
-    
+
     // Create start button
     this.startButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "start").setScale(8).setInteractive();
     this.startButton.on("pointerup", () => {
@@ -216,5 +216,22 @@ class PreBoss extends Game {
 class Boss extends Game {
   constructor() {
     super("Boss", 0, 0, 0, 0);
+  }
+}
+
+// ********** Cutscenes **********
+class PiFact extends Phaser.Scene {
+  constructor(key) {
+    super(key);
+  }
+  preload() {
+    // Load assets
+    this.load.image("pi", "assets/pi.png");
+  }
+  create() {
+
+  }
+  update() {
+
   }
 }
