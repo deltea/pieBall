@@ -33,6 +33,7 @@ class Game extends Phaser.Scene {
     this.load.image("enemy", "assets/enemy.png");
     this.load.image("fastEnemy", "assets/fastEnemy.png");
     this.load.image("multiEnemy", "assets/multiEnemy.png");
+    this.load.image("cheaterEnemy", "assets/cheaterEnemy.png");
     this.load.image("floor0", "assets/floor0.png");
     this.load.image("floor1", "assets/floor1.png");
     this.load.image("floor2", "assets/floor2.png");
@@ -99,17 +100,31 @@ class Game extends Phaser.Scene {
       enemy.pieTimerMax = game.engine.randomBetween(50, 250);
       enemy.pieTimer = 0;
     }
+    for (var i = 0; i < this.enemyCount["cheater"]; i++) {
+      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["cheater"]) * i, game.engine.gameHeight / 4, "cheaterEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+      enemy.pieTimerMax = game.engine.randomBetween(50, 500);
+      enemy.pieTimer = 0;
+      enemy.lives = 2;
+    }
 
     // ********** Colliders **********
     this.physics.add.collider(game.player, game.boundaries);
     this.physics.add.collider(game.player, game.enemyPies);
     this.physics.add.collider(game.enemies, game.boundaries);
+    this.physics.add.collider(game.pies, game.pies);
+    this.physics.add.collider(game.pies, game.enemyPies);
     this.physics.add.collider(game.enemies, game.pies, (enemy, pie) => {
       game.sfx.hit.play();
-      enemy.destroy();
+      if (enemy.texture.key === "cheaterEnemy") {
+        enemy.lives--;
+        if (enemy.lives <= 0) {
+          enemy.destroy();
+        }
+      } else {
+        enemy.destroy();
+      }
       pie.destroy();
     });
-    this.physics.add.collider(game.pies, game.pies);
 
     // ********** Interaction **********
     this.input.on("pointerup", () => {
