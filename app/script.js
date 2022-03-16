@@ -32,6 +32,7 @@ class Game extends Phaser.Scene {
     this.load.image("reloadBar", "assets/reloadBar.png");
     this.load.image("enemy", "assets/enemy.png");
     this.load.image("fastEnemy", "assets/fastEnemy.png");
+    this.load.image("multiEnemy", "assets/multiEnemy.png");
     this.load.image("floor0", "assets/floor0.png");
     this.load.image("floor1", "assets/floor1.png");
     this.load.image("floor2", "assets/floor2.png");
@@ -85,12 +86,17 @@ class Game extends Phaser.Scene {
     // Create enemies
     for (var i = 0; i < this.enemyCount["normal"]; i++) {
       let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["normal"]) * i, game.engine.gameHeight / 4, "enemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
-      enemy.pieTimerMax = game.engine.randomBetween(100, 500);
+      enemy.pieTimerMax = game.engine.randomBetween(50, 500);
       enemy.pieTimer = 0;
     }
     for (var i = 0; i < this.enemyCount["fast"]; i++) {
       let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["fast"]) * i, game.engine.gameHeight / 4, "fastEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
-      enemy.pieTimerMax = game.engine.randomBetween(100, 250);
+      enemy.pieTimerMax = game.engine.randomBetween(50, 250);
+      enemy.pieTimer = 0;
+    }
+    for (var i = 0; i < this.enemyCount["multi"]; i++) {
+      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["multi"]) * i, game.engine.gameHeight / 4, "multiEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+      enemy.pieTimerMax = game.engine.randomBetween(50, 250);
       enemy.pieTimer = 0;
     }
 
@@ -169,9 +175,12 @@ class Game extends Phaser.Scene {
       enemy.pieTimer++;
       if (enemy.pieTimer >= enemy.pieTimerMax) {
         game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500));
+        if (enemy.texture.key === "multiEnemy") {
+          game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500));
+        }
         enemy.pieTimerMax = game.engine.randomBetween(100, 500);
         if (enemy.texture.key === "fastEnemy") {
-          enemy.pieTimerMax = game.engine.randomBetween(100, 250);
+          enemy.pieTimerMax = game.engine.randomBetween(50, 250);
         }
         enemy.pieTimer = 0;
       }
@@ -203,7 +212,7 @@ class Start extends Phaser.Scene {
     this.startButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "start").setScale(8).setInteractive();
     this.startButton.on("pointerup", () => {
       this.scene.stop();
-      this.scene.start("Level1");
+      this.scene.start("Level3");
     });
     this.startButton.on("pointerover", () => {
       phaser.pickerGroup.create(phaser.startButton.x - 160, phaser.startButton.y - 8, "picker").setScale(8);
