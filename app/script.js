@@ -9,7 +9,8 @@ let game = {
   pieAngle: 0,
   pieDir: -2,
   holdDur: 0,
-  sfx: {}
+  sfx: {},
+  playerFrozen: false
 };
 class Game extends Phaser.Scene {
   constructor(key, levelNum, normalCount, fastCount, cheaterCount, multiCount) {
@@ -35,6 +36,7 @@ class Game extends Phaser.Scene {
     this.load.image("fastEnemy", "assets/fastEnemy.png");
     this.load.image("multiEnemy", "assets/multiEnemy.png");
     this.load.image("cheaterEnemy", "assets/cheaterEnemy.png");
+    this.load.image("boss", "assets/boss.png");
     this.load.image("floor0", "assets/floor0.png");
     this.load.image("floor1", "assets/floor1.png");
     this.load.image("floor2", "assets/floor2.png");
@@ -68,6 +70,7 @@ class Game extends Phaser.Scene {
 
     // Create player
     game.player = this.physics.add.sprite(game.engine.gameWidthCenter, 3 * (game.engine.gameHeight / 4), "player").setScale(8).setGravityY(-1500).setDrag(500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+    game.playerFrozen = false;
 
     // Create boundary
     for (var i = 0; i < 400 * Math.round(game.engine.gameWidth / 400) + 1; i += 400) {
@@ -107,6 +110,12 @@ class Game extends Phaser.Scene {
       enemy.pieTimer = 0;
       enemy.lives = 2;
     }
+    if (this.levelNum === 4) {
+      let enemy = game.enemies.create(game.engine.gameWidthCenter, game.engine.gameHeight / 4, "boss").setScale(8).setGravityY(-1500).setSize(8, 4).setOffset(0, 0).setCollideWorldBounds(true);
+      enemy.pieTimerMax = game.engine.randomBetween(1, 50);
+      enemy.pieTimer = 0;
+      enemy.lives = 3;
+    }
 
     // ********** Colliders **********
     this.physics.add.collider(game.player, game.boundaries);
@@ -116,7 +125,7 @@ class Game extends Phaser.Scene {
     this.physics.add.collider(game.pies, game.enemyPies);
     this.physics.add.collider(game.enemies, game.pies, (enemy, pie) => {
       game.sfx.hit.play();
-      if (enemy.texture.key === "cheaterEnemy") {
+      if (enemy.texture.key === "cheaterEnemy" || enemy.texture.key === "boss") {
         enemy.lives--;
         if (enemy.lives <= 0) {
           enemy.destroy();
@@ -144,7 +153,7 @@ class Game extends Phaser.Scene {
       delay: 2000,
       callback: () => {
         game.enemies.getChildren().forEach(enemy => {
-          if (enemy.texture.key === "fastEnemy") {
+          if (enemy.texture.key === "fastEnemy" || enemy.texture.key === "boss") {
             enemy.setVelocityY(game.engine.randomBetween(-600, 600));
             enemy.setVelocityX(game.engine.randomBetween(-600, 600));
           } else {
@@ -159,19 +168,21 @@ class Game extends Phaser.Scene {
   }
   update() {
     // Player movement
-    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A).isDown) {
-      game.player.setVelocityX(-300);
-      game.pieDir = -2;
-    }
-    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D).isDown) {
-      game.player.setVelocityX(300);
-      game.pieDir = 2;
-    }
-    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S).isDown) {
-      game.player.setVelocityY(300);
-    }
-    if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).isDown) {
-      game.player.setVelocityY(-300);
+    if (!game.playerFrozen) {
+      if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A).isDown) {
+        game.player.setVelocityX(-300);
+        game.pieDir = -2;
+      }
+      if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D).isDown) {
+        game.player.setVelocityX(300);
+        game.pieDir = 2;
+      }
+      if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S).isDown) {
+        game.player.setVelocityY(300);
+      }
+      if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).isDown) {
+        game.player.setVelocityY(-300);
+      }
     }
     if (game.engine.mouseDown && game.holdDur < 500 && game.reloadBarStuff.height >= 544) {
       game.holdDur += 5;
@@ -198,12 +209,19 @@ class Game extends Phaser.Scene {
         if (enemy.texture.key === "fastEnemy") {
           enemy.pieTimerMax = game.engine.randomBetween(50, 250);
         }
+        if (enemy.texture.key === "boss") {
+          enemy.pieTimerMax = game.engine.randomBetween(1, 50);
+        }
         enemy.pieTimer = 0;
       }
     });
+    let phaser = this;
     if (game.enemies.getChildren().length === 0) {
-      this.scene.stop();
-      this.scene.start(`PiFact${this.levelNum}`);
+      setTimeout(function () {
+        game.playerFrozen = true;
+        phaser.scene.stop();
+        phaser.scene.start(`PiFact${this.levelNum}`);
+      }, 1000);
     }
   }
 }
@@ -232,7 +250,7 @@ class Start extends Phaser.Scene {
     this.startButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "start").setScale(8).setInteractive();
     this.startButton.on("pointerup", () => {
       this.scene.stop();
-      this.scene.start("Level1");
+      this.scene.start("Boss");
     });
     this.startButton.on("pointerover", () => {
       phaser.pickerGroup.create(phaser.startButton.x - 160, phaser.startButton.y - 8, "picker").setScale(8);
@@ -264,7 +282,7 @@ class Level3 extends Game {
 }
 class Boss extends Game {
   constructor() {
-    super("Boss", 5, 0, 0, 0, 0);
+    super("Boss", 4, 0, 0, 0, 0);
   }
 }
 
