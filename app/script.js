@@ -12,7 +12,7 @@ let game = {
   sfx: {}
 };
 class Game extends Phaser.Scene {
-  constructor(key, normalCount, fastCount, cheaterCount, multiCount) {
+  constructor(key, levelNum, normalCount, fastCount, cheaterCount, multiCount) {
     super(key);
     this.enemyCount = {
       "normal": normalCount,
@@ -20,6 +20,7 @@ class Game extends Phaser.Scene {
       "cheater": cheaterCount,
       "multi": multiCount
     };
+    this.levelNum = levelNum;
   }
   preload() {
     // Load assets
@@ -86,22 +87,22 @@ class Game extends Phaser.Scene {
 
     // Create enemies
     for (var i = 0; i < this.enemyCount["normal"]; i++) {
-      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["normal"]) * i, game.engine.gameHeight / 4, "enemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+      let enemy = game.enemies.create(game.engine.gameWidthCenter, game.engine.gameHeight / 4, "enemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
       enemy.pieTimerMax = game.engine.randomBetween(50, 500);
       enemy.pieTimer = 0;
     }
     for (var i = 0; i < this.enemyCount["fast"]; i++) {
-      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["fast"]) * i, game.engine.gameHeight / 4, "fastEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+      let enemy = game.enemies.create(game.engine.gameWidthCenter, game.engine.gameHeight / 4, "fastEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
       enemy.pieTimerMax = game.engine.randomBetween(50, 250);
       enemy.pieTimer = 0;
     }
     for (var i = 0; i < this.enemyCount["multi"]; i++) {
-      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["multi"]) * i, game.engine.gameHeight / 4, "multiEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+      let enemy = game.enemies.create(game.engine.gameWidthCenter, game.engine.gameHeight / 4, "multiEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
       enemy.pieTimerMax = game.engine.randomBetween(50, 250);
       enemy.pieTimer = 0;
     }
     for (var i = 0; i < this.enemyCount["cheater"]; i++) {
-      let enemy = game.enemies.create((game.engine.gameWidth / this.enemyCount["cheater"]) * i, game.engine.gameHeight / 4, "cheaterEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
+      let enemy = game.enemies.create(game.engine.gameWidthCenter, game.engine.gameHeight / 4, "cheaterEnemy").setScale(8).setGravityY(-1500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
       enemy.pieTimerMax = game.engine.randomBetween(50, 500);
       enemy.pieTimer = 0;
       enemy.lives = 2;
@@ -200,6 +201,10 @@ class Game extends Phaser.Scene {
         enemy.pieTimer = 0;
       }
     });
+    if (game.enemies.getChildren().length === 0) {
+      this.scene.stop();
+      this.scene.start(`PiFact${this.levelNum}`);
+    }
   }
 }
 
@@ -227,7 +232,7 @@ class Start extends Phaser.Scene {
     this.startButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "start").setScale(8).setInteractive();
     this.startButton.on("pointerup", () => {
       this.scene.stop();
-      this.scene.start("Level3");
+      this.scene.start("Level1");
     });
     this.startButton.on("pointerover", () => {
       phaser.pickerGroup.create(phaser.startButton.x - 160, phaser.startButton.y - 8, "picker").setScale(8);
@@ -244,43 +249,66 @@ class Start extends Phaser.Scene {
 // ********** Levels **********
 class Level1 extends Game {
   constructor() {
-    super("Level1", 4, 1, 0, 0);
+    super("Level1", 1, 4, 1, 0, 0);
   }
 }
 class Level2 extends Game {
   constructor() {
-    super("Level2", 3, 1, 1, 0);
+    super("Level2", 2, 3, 1, 1, 0);
   }
 }
 class Level3 extends Game {
   constructor() {
-    super("Level3", 1, 2, 1, 1);
-  }
-}
-class PreBoss extends Game {
-  constructor() {
-    super("PreBoss", 0, 2, 2, 2);
+    super("Level3", 3, 1, 2, 1, 1);
   }
 }
 class Boss extends Game {
   constructor() {
-    super("Boss", 0, 0, 0, 0);
+    super("Boss", 5, 0, 0, 0, 0);
   }
 }
 
 // ********** Cutscenes **********
 class PiFact extends Phaser.Scene {
-  constructor(key) {
+  constructor(key, factNum) {
     super(key);
+    this.factNum = factNum;
   }
   preload() {
     // Load assets
     this.load.image("pi", "assets/pi.png");
+    this.load.image("piFact1", "assets/piFact1.png");
+    this.load.image("piFact2", "assets/piFact2.png");
+    this.load.image("piFact3", "assets/piFact3.png");
   }
   create() {
+    this.engine = new Engine(this);
 
+    // Create pi symbol
+    this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "pi").setScale(8);
+
+    // Create the fact
+    this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, `piFact${this.factNum}`).setScale(8);
+
+    // Transition to next scene
+    this.input.on("pointerup", () => {
+      this.scene.stop();
+      this.scene.start(`Level${this.factNum + 1}`);
+    });
   }
-  update() {
-
+}
+class PiFact1 extends PiFact {
+  constructor() {
+    super("PiFact1", 1);
+  }
+}
+class PiFact2 extends PiFact {
+  constructor() {
+    super("PiFact2", 2);
+  }
+}
+class PiFact3 extends PiFact {
+  constructor() {
+    super("PiFact3", 3);
   }
 }
