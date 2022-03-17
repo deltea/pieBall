@@ -48,6 +48,7 @@ class Game extends Phaser.Scene {
   create() {
     game.engine = new Engine(this);
     game.engine.mouseInput();
+    game.phaser = this;
 
     // Sounds
     game.sfx.music = this.sound.add("music").setLoop(true).play({volume: 0.5});
@@ -119,10 +120,14 @@ class Game extends Phaser.Scene {
 
     // ********** Colliders **********
     this.physics.add.collider(game.player, game.boundaries);
-    this.physics.add.collider(game.player, game.enemyPies);
     this.physics.add.collider(game.enemies, game.boundaries);
     this.physics.add.collider(game.pies, game.pies);
     this.physics.add.collider(game.pies, game.enemyPies);
+    this.physics.add.collider(game.player, game.enemyPies, (player, pie) => {
+      game.playerFrozen = true;
+      game.phaser.scene.stop();
+      game.phaser.scene.start("Lose");
+    });
     this.physics.add.collider(game.enemies, game.pies, (enemy, pie) => {
       game.sfx.hit.play();
       if (enemy.texture.key === "cheaterEnemy" || enemy.texture.key === "boss") {
@@ -215,12 +220,15 @@ class Game extends Phaser.Scene {
         enemy.pieTimer = 0;
       }
     });
-    let phaser = this;
     if (game.enemies.getChildren().length === 0) {
       setTimeout(function () {
         game.playerFrozen = true;
-        phaser.scene.stop();
-        phaser.scene.start(`PiFact${this.levelNum}`);
+        game.phaser.scene.stop();
+        if (this.levelNum !== 4) {
+          game.phaser.scene.start(`PiFact${this.levelNum}`);
+        } else {
+          game.phaser.scene.start("Win");
+        }
       }, 1000);
     }
   }
@@ -238,6 +246,7 @@ class Start extends Phaser.Scene {
   }
   create() {
     this.engine = new Engine(this);
+    game.phaser = this;
 
     // Create title
     this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "title").setScale(8);
@@ -246,21 +255,38 @@ class Start extends Phaser.Scene {
     this.pickerGroup = this.physics.add.staticGroup();
 
     // Create start button
-    let phaser = this;
     this.startButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "start").setScale(8).setInteractive();
     this.startButton.on("pointerup", () => {
       this.scene.stop();
-      this.scene.start("Boss");
+      this.scene.start("Level1");
     });
     this.startButton.on("pointerover", () => {
-      phaser.pickerGroup.create(phaser.startButton.x - 160, phaser.startButton.y - 8, "picker").setScale(8);
-      phaser.pickerGroup.create(phaser.startButton.x + 100, phaser.startButton.y - 8, "picker").setScale(8).flipX = true;
+      game.phaser.pickerGroup.create(game.phaser.startButton.x - 160, game.phaser.startButton.y - 8, "picker").setScale(8);
+      game.phaser.pickerGroup.create(game.phaser.startButton.x + 100, game.phaser.startButton.y - 8, "picker").setScale(8).flipX = true;
     });
     this.startButton.on("pointerout", () => {
-      phaser.pickerGroup.getChildren().forEach(picker => {
+      game.phaser.pickerGroup.getChildren().forEach(picker => {
         picker.visible = false;
       });
     });
+  }
+}
+
+// ********** Lose scene **********
+class Lose extends Phaser.Scene {
+  constructor() {
+    super("Lose");
+  }
+  preload() {
+    // ---------- Load assets ----------
+    this.load.image("youLose", "assets/youLose.png");
+  }
+  create() {
+    this.engine = new Engine();
+    game.phaser = this;
+
+    // Create "You lose" sign
+    this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "youLose").setScale(8);
   }
 }
 
@@ -301,6 +327,7 @@ class PiFact extends Phaser.Scene {
   }
   create() {
     this.engine = new Engine(this);
+    game.phaser = this;
 
     // Create pi symbol
     this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "pi").setScale(8);
