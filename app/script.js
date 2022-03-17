@@ -201,9 +201,9 @@ class Game extends Phaser.Scene {
     game.enemies.getChildren().forEach(enemy => {
       enemy.pieTimer++;
       if (enemy.pieTimer >= enemy.pieTimerMax) {
-        game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500));
+        game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500)).flipY = true;
         if (enemy.texture.key === "multiEnemy") {
-          game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500));
+          game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500)).flipY = true;
         }
         enemy.pieTimerMax = game.engine.randomBetween(100, 500);
         if (enemy.texture.key === "fastEnemy") {
