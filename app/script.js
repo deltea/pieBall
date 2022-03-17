@@ -62,13 +62,6 @@ class Game extends Phaser.Scene {
     game.enemyPies = this.physics.add.group();
     game.enemies = this.physics.add.group();
 
-    // Create the floor
-    for (var x = 0; x < Math.round(game.engine.gameWidth * 8); x += 64) {
-      for (var y = 0; y < Math.round(game.engine.gameHeight * 8); y += 64) {
-        this.add.image(x, y, `floor${Math.floor(Math.random() * 3)}`).setScale(8);
-      }
-    }
-
     // Create player
     game.player = this.physics.add.sprite(game.engine.gameWidthCenter, 3 * (game.engine.gameHeight / 4), "player").setScale(8).setGravityY(-1500).setDrag(500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
     game.playerFrozen = false;
