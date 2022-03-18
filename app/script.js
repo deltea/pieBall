@@ -119,10 +119,14 @@ class Game extends Phaser.Scene {
 
     // ********** Colliders **********
     this.physics.add.collider(game.player, game.boundaries);
-    this.physics.add.collider(game.player, game.enemyPies);
     this.physics.add.collider(game.enemies, game.boundaries);
     this.physics.add.collider(game.pies, game.pies);
     this.physics.add.collider(game.pies, game.enemyPies);
+    this.physics.add.collider(game.player, game.enemyPies, (player, pie) => {
+      game.playerFrozen = true;
+      game.phaser.scene.stop();
+      game.phaser.scene.start("Lose");
+    });
     this.physics.add.collider(game.enemies, game.pies, (enemy, pie) => {
       game.sfx.hit.play();
       if (enemy.texture.key === "cheaterEnemy" || enemy.texture.key === "boss") {
@@ -219,8 +223,12 @@ class Game extends Phaser.Scene {
     if (game.enemies.getChildren().length === 0) {
       setTimeout(function () {
         game.playerFrozen = true;
-        phaser.scene.stop();
-        phaser.scene.start(`PiFact${this.levelNum}`);
+        game.phaser.scene.stop();
+        if (this.levelNum !== 4) {
+          game.phaser.scene.start(`PiFact${this.levelNum}`);
+        } else {
+          game.phaser.scene.start("Win");
+        }
       }, 1000);
     }
   }
@@ -250,7 +258,7 @@ class Start extends Phaser.Scene {
     this.startButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "start").setScale(8).setInteractive();
     this.startButton.on("pointerup", () => {
       this.scene.stop();
-      this.scene.start("Boss");
+      this.scene.start("Level1");
     });
     this.startButton.on("pointerover", () => {
       phaser.pickerGroup.create(phaser.startButton.x - 160, phaser.startButton.y - 8, "picker").setScale(8);
@@ -261,6 +269,23 @@ class Start extends Phaser.Scene {
         picker.visible = false;
       });
     });
+  }
+}
+
+// ********** Lose scene **********
+class Lose extends Phaser.Scene {
+  constructor() {
+    super("Lose");
+  }
+  preload() {
+    // ---------- Load assets ----------
+    this.load.image("youLose", "assets/youLose.png");
+  }
+  create() {
+    this.engine = new Engine();
+
+    // Create "You lose" sign
+    this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "youLose").setScale(8);
   }
 }
 
