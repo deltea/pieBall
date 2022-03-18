@@ -218,8 +218,8 @@ class Game extends Phaser.Scene {
       setTimeout(function () {
         game.playerFrozen = true;
         phaser.scene.stop();
-        if (this.levelNum !== 4) {
-          phaser.scene.start(`PiFact${this.levelNum}`);
+        if (phaser.levelNum !== 4) {
+          phaser.scene.start(`PiFact${phaser.levelNum}`);
         } else {
           phaser.scene.start("Win");
         }
