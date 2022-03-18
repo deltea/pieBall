@@ -274,12 +274,33 @@ class Lose extends Phaser.Scene {
   preload() {
     // ---------- Load assets ----------
     this.load.image("youLose", "assets/youLose.png");
+    this.load.image("tryAgain", "assets/tryAgain.png");
   }
   create() {
-    this.engine = new Engine();
+    this.engine = new Engine(this);
+    let phaser = this;
 
     // Create "You lose" sign
     this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "youLose").setScale(8);
+
+    // Picker group
+    this.pickerGroup = this.physics.add.staticGroup();
+
+    // Create start button
+    this.tryAgainButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "tryAgain").setScale(8).setInteractive();
+    this.tryAgainButton.on("pointerup", () => {
+      this.scene.stop();
+      this.scene.start("Level1");
+    });
+    this.tryAgainButton.on("pointerover", () => {
+      phaser.pickerGroup.create(phaser.tryAgainButton.x - 220, phaser.tryAgainButton.y - 8, "picker").setScale(8);
+      phaser.pickerGroup.create(phaser.tryAgainButton.x + 180, phaser.tryAgainButton.y - 8, "picker").setScale(8).flipX = true;
+    });
+    this.tryAgainButton.on("pointerout", () => {
+      phaser.pickerGroup.getChildren().forEach(picker => {
+        picker.visible = false;
+      });
+    });
   }
 }
 
