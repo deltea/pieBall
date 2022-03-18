@@ -218,7 +218,7 @@ class Game extends Phaser.Scene {
         game.playerFrozen = true;
         game.phaser.scene.stop();
         if (this.levelNum !== 4) {
-          game.phaser.scene.start(`PiFact${this.levelNum}`);
+          game.phaser.scene.start(`PiFact1`);
         } else {
           game.phaser.scene.start("Win");
         }
