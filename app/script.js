@@ -61,13 +61,6 @@ class Game extends Phaser.Scene {
     game.enemyPies = this.physics.add.group();
     game.enemies = this.physics.add.group();
 
-    // Create the floor
-    for (var x = 0; x < Math.round(game.engine.gameWidth * 8); x += 64) {
-      for (var y = 0; y < Math.round(game.engine.gameHeight * 8); y += 64) {
-        this.add.image(x, y, `floor${Math.floor(Math.random() * 3)}`).setScale(8);
-      }
-    }
-
     // Create player
     game.player = this.physics.add.sprite(game.engine.gameWidthCenter, 3 * (game.engine.gameHeight / 4), "player").setScale(8).setGravityY(-1500).setDrag(500).setSize(5, 3).setOffset(0, 0).setCollideWorldBounds(true);
     game.playerFrozen = false;
@@ -118,14 +111,15 @@ class Game extends Phaser.Scene {
     }
 
     // ********** Colliders **********
+    let phaser = this;
     this.physics.add.collider(game.player, game.boundaries);
     this.physics.add.collider(game.enemies, game.boundaries);
     this.physics.add.collider(game.pies, game.pies);
     this.physics.add.collider(game.pies, game.enemyPies);
     this.physics.add.collider(game.player, game.enemyPies, (player, pie) => {
       game.playerFrozen = true;
-      game.phaser.scene.stop();
-      game.phaser.scene.start("Lose");
+      phaser.scene.stop();
+      phaser.scene.start("Lose");
     });
     this.physics.add.collider(game.enemies, game.pies, (enemy, pie) => {
       game.sfx.hit.play();
@@ -171,6 +165,7 @@ class Game extends Phaser.Scene {
     });
   }
   update() {
+    let phaser = this;
     // Player movement
     if (!game.playerFrozen) {
       if (this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A).isDown) {
@@ -219,15 +214,14 @@ class Game extends Phaser.Scene {
         enemy.pieTimer = 0;
       }
     });
-    let phaser = this;
     if (game.enemies.getChildren().length === 0) {
       setTimeout(function () {
         game.playerFrozen = true;
-        game.phaser.scene.stop();
+        phaser.scene.stop();
         if (this.levelNum !== 4) {
-          game.phaser.scene.start(`PiFact${this.levelNum}`);
+          phaser.scene.start(`PiFact${this.levelNum}`);
         } else {
-          game.phaser.scene.start("Win");
+          phaser.scene.start("Win");
         }
       }, 1000);
     }
@@ -246,6 +240,7 @@ class Start extends Phaser.Scene {
   }
   create() {
     this.engine = new Engine(this);
+    let phaser = this;
 
     // Create title
     this.add.image(this.engine.gameWidthCenter, this.engine.gameHeight / 4, "title").setScale(8);
@@ -254,7 +249,6 @@ class Start extends Phaser.Scene {
     this.pickerGroup = this.physics.add.staticGroup();
 
     // Create start button
-    let phaser = this;
     this.startButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "start").setScale(8).setInteractive();
     this.startButton.on("pointerup", () => {
       this.scene.stop();
