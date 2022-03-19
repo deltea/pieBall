@@ -50,7 +50,8 @@ class Game extends Phaser.Scene {
     game.engine.mouseInput();
 
     // Sounds
-    game.sfx.music = this.sound.add("music").setLoop(true).play({volume: 0.5});
+    game.sfx.music = this.sound.add("music").setLoop(true);
+    game.sfx.music.play({volume: 0.5});
     game.sfx.hit = this.sound.add("hit");
     game.sfx.ready = this.sound.add("ready");
     game.sfx.throw = this.sound.add("throw");
@@ -118,6 +119,7 @@ class Game extends Phaser.Scene {
     this.physics.add.collider(game.pies, game.enemyPies);
     this.physics.add.collider(game.player, game.enemyPies, (player, pie) => {
       game.playerFrozen = true;
+      game.sfx.music.stop();
       phaser.scene.stop();
       phaser.scene.start("Lose");
     });
@@ -216,7 +218,8 @@ class Game extends Phaser.Scene {
     });
     if (game.enemies.getChildren().length === 0) {
       setTimeout(function () {
-        game.playerFrozen = true;
+        game.playerFrozen = true
+        game.sfx.music.stop();
         phaser.scene.stop();
         if (phaser.levelNum !== 4) {
           phaser.scene.start(`PiFact${phaser.levelNum}`);
