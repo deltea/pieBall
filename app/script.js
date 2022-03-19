@@ -10,7 +10,8 @@ let game = {
   pieDir: -2,
   holdDur: 0,
   sfx: {},
-  playerFrozen: false
+  playerFrozen: false,
+  currentLevel: 1
 };
 class Game extends Phaser.Scene {
   constructor(key, levelNum, normalCount, fastCount, cheaterCount, multiCount) {
@@ -48,6 +49,7 @@ class Game extends Phaser.Scene {
   create() {
     game.engine = new Engine(this);
     game.engine.mouseInput();
+    game.currentLevel = this.levelNum;
 
     // Sounds
     game.sfx.music = this.sound.add("music").setLoop(true);
@@ -202,9 +204,9 @@ class Game extends Phaser.Scene {
     game.enemies.getChildren().forEach(enemy => {
       enemy.pieTimer++;
       if (enemy.pieTimer >= enemy.pieTimerMax) {
-        game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500)).flipY = true;
+        game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 4).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500)).flipY = true;
         if (enemy.texture.key === "multiEnemy") {
-          game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 0).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500)).flipY = true;
+          game.enemyPies.create(enemy.x, enemy.y, "pie").setScale(8).setGravityY(-1500).setSize(6, 4).setOffset(0, 4).setVelocityY(300).setVelocityX(game.engine.randomBetween(-500, 500)).flipY = true;
         }
         enemy.pieTimerMax = game.engine.randomBetween(100, 500);
         if (enemy.texture.key === "fastEnemy") {
@@ -354,7 +356,11 @@ class PiFact extends Phaser.Scene {
     // Transition to next scene
     this.input.on("pointerup", () => {
       this.scene.stop();
-      this.scene.start(`Level${this.factNum + 1}`);
+      if (this.factNum === 3) {
+        this.scene.start("Boss");
+      } else {
+        this.scene.start(`Level${this.factNum + 1}`);
+      }
     });
   }
 }
