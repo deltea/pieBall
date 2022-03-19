@@ -295,7 +295,7 @@ class Lose extends Phaser.Scene {
     this.tryAgainButton = this.add.image(this.engine.gameWidthCenter, (this.engine.gameHeight / 4) * 3, "tryAgain").setScale(8).setInteractive();
     this.tryAgainButton.on("pointerup", () => {
       this.scene.stop();
-      this.scene.start("Level1");
+      this.scene.start(`Level${game.currentLevel}`);
     });
     this.tryAgainButton.on("pointerover", () => {
       phaser.pickerGroup.create(phaser.tryAgainButton.x - 220, phaser.tryAgainButton.y - 8, "picker").setScale(8);
