@@ -200,7 +200,7 @@ class Game extends Phaser.Scene {
     game.pieAngle += game.pieDir;
     game.arrow.x = game.player.x - 10;
     game.arrow.y = game.player.y - 20;
-    game.arrow.angle = game.pieAngle + 160;
+    game.arrow.angle = game.pieAngle + 140;
     game.enemies.getChildren().forEach(enemy => {
       enemy.pieTimer++;
       if (enemy.pieTimer >= enemy.pieTimerMax) {
